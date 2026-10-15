@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f4ef">
+  <meta name="description" content="Plan a room refresh around your style and budget with Roomify's interactive design studio.">
+  <title>Roomify — a room that feels like you</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="stylesheet" href="/styles.css?v=2">
+</head>
+<body>
+  <div class="site-shell">
+    <header class="topbar">
+      <a class="brand" href="#home" aria-label="Roomify home">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        <span>roomify</span>
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="#studio">Design studio</a>
+        <a href="#saved">My designs <span class="nav-count" id="savedCount">0</span></a>
+        <a href="#plans">Plans</a>
+      </nav>
+      <button class="button button-quiet signin-button" data-modal="signin">Sign in <span class="avatar-dot">D</span></button>
+      <button class="mobile-menu" id="mobileMenu" aria-label="Open navigation">☰</button>
+    </header>
+
+    <main>
+      <section class="hero section-wrap" id="home">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-dot"></span> A calmer way to redesign</div>
+          <h1>A room that<br>feels like <em>you.</em></h1>
+          <p class="hero-lede">Turn the “what if?” into a plan. Explore a style, set a budget, and build a room refresh around real products.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#studio">Start your design <span aria-hidden="true">↗</span></a>
+            <a class="text-link" href="#how-it-works">See how it works <span aria-hidden="true">↓</span></a>
+          </div>
+          <div class="hero-proof"><span class="proof-icon">✓</span><span>Style-first ideas</span><span class="proof-separator">·</span><span>Budget-aware shopping list</span></div>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-photo-wrap">
+            <img class="hero-photo" src="/assets/style-scandinavian.jpg" alt="Scandinavian-inspired living room concept">
+            <div class="photo-stamp"><span>ROOMIFY</span><strong>Make room<br>for better.</strong></div>
+          </div>
+          <div class="floating-note floating-note-top"><span class="note-icon">✳</span><span><b>Find your feeling</b><small>5 design directions</small></span></div>
+          <div class="floating-note floating-note-bottom"><span class="mini-swatch"></span><span><b>Scandinavian</b><small>Starter list · £679</small></span><span class="note-arrow">↗</span></div>
+          <div class="hero-orbit" aria-hidden="true"></div>
+        </div>
+      </section>
+
+      <section class="feature-strip section-wrap" id="how-it-works">
+        <div class="feature-intro"><span class="eyebrow">FROM ROOM PHOTO TO ROOM PLAN</span><p>Thoughtful choices, in a few simple steps.</p></div>
+        <div class="feature-step"><span class="step-number">01</span><span class="step-icon">▧</span><div><b>Bring your room</b><small>Upload a photo or start with a style.</small></div></div>
+        <div class="feature-step"><span class="step-number">02</span><span class="step-icon">◌</span><div><b>Choose your direction</b><small>Pick a mood and set your budget.</small></div></div>
+        <div class="feature-step"><span class="step-number">03</span><span class="step-icon">↗</span><div><b>Make it yours</b><small>Review a plan and explore products.</small></div></div>
+      </section>
+
+      <section class="studio-section section-wrap" id="studio">
+        <div class="section-heading">
+          <div><span class="eyebrow">YOUR DESIGN STUDIO</span><h2>Start with a feeling.</h2></div>
+          <p>Set the direction. We’ll help turn it into a considered shopping list.</p>
+        </div>
+        <div class="studio-grid">
+          <section class="studio-controls card" aria-label="Design settings">
+            <div class="card-heading"><div><span class="eyebrow">01 / YOUR SPACE</span><h3>Bring in your room</h3></div><span class="optional-pill">Optional</span></div>
+            <label class="upload-zone" id="uploadZone" for="roomFile">
+              <input id="roomFile" type="file" accept="image/*" hidden>
+              <span class="upload-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M4 15.5v3A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5v-3"/></svg></span>
+              <span class="upload-title" id="uploadTitle">Drop a room photo here</span>
+              <span class="upload-subtitle" id="uploadSubtitle">or browse files · JPG, PNG · max 10 MB</span>
+              <img id="uploadThumb" class="upload-thumb" alt="Your uploaded room preview" hidden>
+              <button type="button" class="upload-clear" id="clearUpload" hidden>Remove photo</button>
+            </label>
+            <p class="privacy-note"><span aria-hidden="true">⌑</span> Demo privacy: your photo stays in this browser; it is not sent to an AI service.</p>
+
+            <div class="control-divider"></div>
+            <div class="card-heading style-heading"><div><span class="eyebrow">02 / YOUR STYLE</span><h3>What feels like you?</h3></div><span class="selection-hint">Choose one</span></div>
+            <div class="style-grid" role="group" aria-label="Choose a design style">
+              <button class="style-choice is-selected" data-style="scandinavian" aria-pressed="true"><img src="/assets/style-scandinavian.jpg" alt=""><span>Scandinavian</span><i>✓</i></button>
+              <button class="style-choice" data-style="japandi" aria-pressed="false"><img src="/assets/style-japandi.jpg" alt=""><span>Japandi</span><i>✓</i></button>
+              <button class="style-choice" data-style="modern" aria-pressed="false"><img src="/assets/style-modern.jpg" alt=""><span>Modern</span><i>✓</i></button>
+              <button class="style-choice" data-style="boho" aria-pressed="false"><img src="/assets/style-boho.jpg" alt=""><span>Boho</span><i>✓</i></button>
+              <button class="style-choice" data-style="industrial" aria-pressed="false"><img src="/assets/style-industrial.jpg" alt=""><span>Industrial</span><i>✓</i></button>
+            </div>
+
+            <div class="control-divider"></div>
+            <div class="budget-row"><div><span class="eyebrow">03 / YOUR BUDGET</span><h3>Keep it comfortable.</h3></div><strong class="budget-output" id="budgetOutput">£900</strong></div>
+            <input class="budget-slider" id="budgetSlider" type="range" min="300" max="2000" step="50" value="900" aria-label="Set your furniture budget">
+            <div class="range-labels"><span>£300</span><span>£2,000</span></div>
+            <div class="budget-helper"><span class="budget-check">✓</span><span>We’ll keep your suggested list within budget.</span></div>
+            <button class="button button-primary button-full create-button" id="createPlan"><span class="button-sparkle">✳</span> Create my design direction <span class="button-arrow">↗</span></button>
+            <p class="demo-smallprint">Interactive demo · Style-reference imagery, not a room-preserving AI render</p>
+          </section>
+
+          <section class="studio-output" aria-live="polite">
+            <div class="output-topline"><span class="eyebrow">YOUR DESIGN DIRECTION</span><span class="demo-chip"><span></span> DEMO PREVIEW</span></div>
+            <div class="design-card card">
+              <div class="design-image-wrap" id="designImageWrap">
+                <img id="designImage" src="/assets/style-scandinavian.jpg" alt="Scandinavian style reference">
+                <div class="before-layer" id="beforeLayer" hidden><img id="beforeImage" alt="Your uploaded room"></div>
+                <div class="before-empty" id="beforeEmpty"><span class="before-empty-mark">R</span><span>Upload a room photo to compare</span></div>
+                <div class="compare-label compare-label-before" id="beforeLabel" hidden>YOUR ROOM</div>
+                <div class="compare-label compare-label-after">STYLE REFERENCE</div>
+                <div class="image-vibe-tag"><span class="vibe-spark">✳</span><span id="imageVibe">Scandinavian mood</span></div>
+              </div>
+              <div class="compare-control" id="compareControl" hidden><span>Before</span><input id="compareSlider" type="range" min="10" max="90" value="50" aria-label="Compare your photo with the style reference"><span>Reference</span></div>
+              <div class="design-summary">
+                <div><span class="eyebrow" id="resultKicker">A STARTING POINT</span><h3 id="resultTitle">Soft light, natural textures.</h3></div>
+                <button class="save-button" id="saveDesign" aria-label="Save design"><span>♡</span> Save</button>
+              </div>
+              <p class="design-description" id="designDescription">A calm palette, tactile layers and pale wood set the tone. Use this as inspiration while you choose pieces that fit your space.</p>
+              <div class="refinement-box">
+                <label for="refinementInput">Make it more yours <span>VISUAL REGENERATION IS NOT CONNECTED</span></label>
+                <div class="refinement-input-row"><input id="refinementInput" type="text" placeholder="e.g. add more plants, keep the sofa…"><button id="applyRefinement" class="button button-dark" type="button">Add note <span>↗</span></button></div>
+                <div id="refinementNotice" class="refinement-notice" aria-live="polite" hidden></div>
+              </div>
+            </div>
+            <div class="shopping-card card">
+              <div class="shopping-header"><div><span class="eyebrow">THE SHOPPING LIST</span><h3>Pieces for the plan</h3></div><span class="item-count" id="itemCount">0 items</span></div>
+              <div class="product-list" id="productList"></div>
+              <div class="shopping-total"><div><span>Estimated total</span><small>UK catalog · prices can change</small></div><strong id="totalPrice">£0</strong></div>
+              <div class="budget-meter"><div class="meter-track"><span id="budgetMeterFill"></span></div><div class="meter-caption"><span id="budgetMeterCaption">Within your budget</span><span id="budgetRemaining">£0 left</span></div></div>
+              <div class="catalog-note">Curated sample from IKEA UK listings. This independent demo is not affiliated with IKEA; check each retailer page for current price and availability.</div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="saved-section section-wrap" id="saved">
+        <div class="section-heading saved-heading"><div><span class="eyebrow">YOUR LITTLE IDEAS LIBRARY</span><h2>Saved designs.</h2></div><p>Saved to this browser only. No account or cloud sync is connected.</p></div>
+        <div class="saved-grid" id="savedGrid"></div>
+      </section>
+
+      <section class="plans-section section-wrap" id="plans">
+        <div class="plans-intro"><span class="eyebrow">A LITTLE ROOM TO GROW</span><h2>Ideas, at your pace.</h2><p>Plan prices mirror the example in the video; checkout is not connected in this prototype.</p></div>
+        <div class="plan-cards">
+          <article class="plan-card"><span class="plan-label">START HERE</span><h3>Free</h3><div class="plan-price">£0 <small>/ forever</small></div><p>Try styles, build a shortlist and save ideas on this device.</p><ul><li>Style and budget controls</li><li>Curated sample shopping list</li><li>Local design saves</li></ul><button class="button button-outline" data-modal="signin">You’re using the demo</button></article>
+          <article class="plan-card plan-pro"><span class="plan-label">FOR THE BIGGER PICTURE</span><h3>Roomify Plus</h3><div class="plan-price">$9 <small>/ month · example</small></div><p>For a future version with more room to experiment.</p><ul><li>More design generations</li><li>Room-specific AI renders</li><li>Cloud-synced saved boards</li></ul><button class="button button-primary" data-modal="upgrade">Join the waitlist <span>↗</span></button></article>
+        </div>
+      </section>
+
+      <section class="closing-cta section-wrap"><div class="closing-art"><span class="closing-sun"></span><span class="closing-line closing-line-one"></span><span class="closing-line closing-line-two"></span><span class="closing-chair"></span></div><div><span class="eyebrow">YOUR ROOM, YOUR RULES</span><h2>Start with one small change.</h2><a class="button button-light" href="#studio">Create a design direction <span>↗</span></a></div></section>
+    </main>
+    <footer class="footer section-wrap"><a class="brand footer-brand" href="#home"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span><span>roomify</span></a><p>Small ideas can change how a room feels.</p><span class="footer-right">Independent demo · Made for better living</span></footer>
+  </div>
+
+  <dialog class="info-dialog" id="infoDialog" aria-labelledby="dialogTitle">
+    <button class="dialog-close" id="closeDialog" aria-label="Close dialog">×</button>
+    <span class="dialog-icon">R</span>
+    <span class="eyebrow" id="dialogEyebrow">ROOMIFY DEMO</span>
+    <h2 id="dialogTitle">A few things are still in the works.</h2>
+    <p id="dialogMessage">This live prototype runs in your browser. Authentication, cloud storage, room-specific AI rendering and subscription payments have not been connected.</p>
+    <button class="button button-primary button-full" id="dialogOk">Got it</button>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="/app.js" defer></script>
+</body>
+</html>
