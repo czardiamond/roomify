@@ -29,6 +29,12 @@ This is not yet a production SaaS. The redesign visual is a generated style refe
 
 The IKEA UK sample prices were checked against official listings on 15 October 2026: GULLVALLA 2-seat sofa (£249), LANDSKRONA 3-seat sofa (£599), LACK coffee table (£40), and ÖKENSAND floor lamp (£40). Prices/availability can change; the app is independent and is not affiliated with IKEA.
 
+## Local integration readiness
+
+Running `node server.js` also exposes a read-only, no-store `GET /api/capabilities` endpoint for the current integration states. It reads no provider credentials and makes no external calls; write methods are disabled. The existing public Cloudflare Worker is still a static-assets deployment and was not changed, so this endpoint is available only when running the local Node server.
+
+Run the dependency-free checks with `node --test`.
+
 ## Project files
 
 - `public/index.html` — interface structure
