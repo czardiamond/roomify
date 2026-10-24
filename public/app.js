@@ -200,7 +200,7 @@ function compressDataUrl(dataUrl) {
 function createPlan() {
   const button = $('#createPlan');
   button.disabled = true;
-  button.innerHTML = '<span class="button-sparkle">✳</span> Putting your plan together…';
+  button.innerHTML = '<span class="button-sparkle">🌻</span> Putting your plan together…';
   setTimeout(() => {
     setStyle(selectedStyle);
     $('#resultKicker').textContent = `${STYLE_DATA[selectedStyle].label.toUpperCase()} / DEMO PLAN`;
@@ -212,7 +212,7 @@ function createPlan() {
     $('#refinementNotice').hidden = true;
     $('#refinementInput').value = '';
     button.disabled = false;
-    button.innerHTML = '<span class="button-sparkle">✳</span> Create my design direction <span class="button-arrow">↗</span>';
+    button.innerHTML = '<span class="button-sparkle">🌻</span> Create my design direction <span class="button-arrow">↗</span>';
     showToast('Your style direction is ready.');
     if (!currentUpload) $('#studio').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 650);
