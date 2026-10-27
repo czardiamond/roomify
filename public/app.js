@@ -43,14 +43,58 @@ function formatGBP(value) {
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 }
-function readSaved() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.saved) || '[]'); }
-  catch { return []; }
+let savedDesigns = [], planCount = 0, activeMemoryUid = null, memoryLoadGeneration = 0;
+function resetAccountSensitiveState() {
+  savedDesigns = [];
+  planCount = 0;
+  latestDesignId = null;
+  clearUploadedPhoto();
+  $('#saveDesign').classList.remove('saved');
+  $('#saveDesign').innerHTML = '<span>♡</span> Save';
+  refreshSavedCount();
+  renderSaved();
 }
-function readCount() {
-  const count = Number.parseInt(localStorage.getItem(STORAGE_KEYS.count) || '0', 10);
-  return Number.isFinite(count) ? count : 0;
+async function loadMemory(authState = {}) {
+  const generation = ++memoryLoadGeneration;
+  try {
+    await window.projectMemoryReady;
+    const memory = window.projectMemory;
+    const uid = authState.user?.uid || memory?.user?.uid || null;
+    if (!memory?.authenticated || !uid) {
+      activeMemoryUid = null;
+      resetAccountSensitiveState();
+      return;
+    }
+    if (activeMemoryUid && activeMemoryUid !== uid) resetAccountSensitiveState();
+    activeMemoryUid = uid;
+    const designs = memory.get('roomify-saved-designs');
+    const count = memory.get('roomify-plan-count');
+    if (generation !== memoryLoadGeneration || memory.user?.uid !== uid) return;
+    savedDesigns = Array.isArray(designs) ? designs.filter(item => item && typeof item === 'object' && typeof item.id === 'string') : [];
+    planCount = Number.isFinite(Number(count)) && Number(count) >= 0 ? Number(count) : 0;
+  } catch {
+    if (generation !== memoryLoadGeneration) return;
+    savedDesigns = [];
+    planCount = 0;
+  }
+  refreshSavedCount();
+  renderSaved();
 }
+function readSaved(){return savedDesigns}
+function readCount(){return planCount}
+const MEDIA_FIELD_RE = /^(?:before|image|imageData|dataUrl|rawMedia|objectUrl|file|blob|attachment|attachments)$/i;
+function withoutMedia(value, key = '') {
+  if (MEDIA_FIELD_RE.test(key)) return undefined;
+  if (typeof value === 'string' && /^(?:data:|blob:)/i.test(value)) return undefined;
+  if (typeof File !== 'undefined' && value instanceof File) return undefined;
+  if (typeof Blob !== 'undefined' && value instanceof Blob) return undefined;
+  if (Array.isArray(value)) return value.map(item => withoutMedia(item)).filter(item => item !== undefined);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([name, item]) => [name, withoutMedia(item, name)]).filter(([, item]) => item !== undefined));
+  }
+  return value;
+}
+const requireAccount=()=>{const memory=window.projectMemory;if(memory?.authenticated && !memory.loading && !memory.error)return true;window.openProjectAccount?.('signin');showToast('Sign in to save your room. Nothing was saved.');return false}
 function showToast(message) {
   const toast = $('#toast');
   toast.textContent = message;
@@ -66,7 +110,7 @@ function openInfoDialog(kind) {
   if (kind === 'signin') {
     eyebrow.textContent = 'ACCOUNT ACCESS';
     title.textContent = 'Your ideas are saved right here.';
-    message.textContent = 'Google sign-in and cloud accounts are not connected in this demo. Save a design on this device and it will appear in My designs in this browser.';
+    message.textContent = 'Sign in to save structured room plans to your private account. Uploaded photos and image previews remain transient in this tab and are never saved to cloud memory.';
   } else {
     eyebrow.textContent = 'ROOMIFY PLUS · COMING LATER';
     title.textContent = 'A bigger room to imagine.';
@@ -197,15 +241,29 @@ function compressDataUrl(dataUrl) {
     image.src = dataUrl;
   });
 }
-function createPlan() {
+async function createPlan() {
+  const memory = window.projectMemory;
+  const canPersist = Boolean(memory?.authenticated && !memory.loading && !memory.error);
+  const ownerUid = canPersist ? memory.user?.uid : null;
   const button = $('#createPlan');
   button.disabled = true;
   button.innerHTML = '<span class="button-sparkle">🌻</span> Putting your plan together…';
-  setTimeout(() => {
+  setTimeout(async () => {
     setStyle(selectedStyle);
     $('#resultKicker').textContent = `${STYLE_DATA[selectedStyle].label.toUpperCase()} / DEMO PLAN`;
     const count = readCount() + 1;
-    localStorage.setItem(STORAGE_KEYS.count, String(count));
+    if (canPersist) try {
+      await memory.set('roomify-plan-count', count);
+      if (memory.user?.uid !== ownerUid || !memory.authenticated) throw new Error('Account changed during operation');
+      planCount = count;
+    } catch {
+      button.disabled = false;
+      button.innerHTML = '<span class="button-sparkle">🌻</span> Create my design direction <span class="button-arrow">↗</span>';
+      showToast('Could not save the plan count privately. Try again.');
+      return;
+    } else {
+      planCount = count;
+    }
     latestDesignId = null;
     $('#saveDesign').classList.remove('saved');
     $('#saveDesign').innerHTML = '<span>♡</span> Save';
@@ -241,12 +299,14 @@ function renderSaved() {
   $$('[data-delete-saved]', grid).forEach(button => button.addEventListener('click', () => deleteSaved(button.dataset.deleteSaved)));
 }
 async function saveDesign() {
+  if (!requireAccount()) return;
+  const memory = window.projectMemory;
+  const ownerUid = memory.user?.uid;
   if (latestDesignId) {
     showToast('This design is already saved.');
     return;
   }
-  const before = currentUpload ? await compressDataUrl(currentUpload) : null;
-  const designs = readSaved();
+  const designs = readSaved().map(design => withoutMedia(design));
   const design = {
     id: String(Date.now()),
     style: selectedStyle,
@@ -254,21 +314,24 @@ async function saveDesign() {
     title: STYLE_DATA[selectedStyle].title,
     budget: Number(budgetSlider.value),
     products: currentPicks.map(item => ({ id: item.id, name: item.name, price: item.price, url: item.url })),
-    before,
+    notes: $('#refinementNotice').textContent || '',
+    metadata: { source: 'roomify', savedAt: new Date().toISOString() },
     date: new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short' }).format(new Date())
   };
-  designs.unshift(design);
+  designs.unshift(withoutMedia(design));
   try {
-    localStorage.setItem(STORAGE_KEYS.saved, JSON.stringify(designs.slice(0, 12)));
+    await memory.set('roomify-saved-designs', designs.slice(0, 12));
+    if (memory.user?.uid !== ownerUid || !memory.authenticated) throw new Error('Account changed during operation');
+    savedDesigns=designs.slice(0,12);
   } catch {
-    showToast('The browser could not save this photo. Remove it and try again.');
+    showToast('Could not save privately. Try again.');
     return;
   }
   latestDesignId = design.id;
   $('#saveDesign').classList.add('saved');
   $('#saveDesign').innerHTML = '<span>♥</span> Saved';
   renderSaved();
-  showToast('Saved on this device.');
+  showToast('Saved privately. Structured plan only; photo preview stays in this tab.');
 }
 function openSaved(id) {
   const design = readSaved().find(item => item.id === id);
@@ -276,17 +339,20 @@ function openSaved(id) {
   budgetSlider.value = String(Math.min(2000, Math.max(300, Number(design.budget) || 900)));
   budgetOutput.textContent = formatGBP(Number(budgetSlider.value));
   setStyle(design.style || 'scandinavian');
-  if (design.before) setUploadPreview(design.before, 'Saved room photo');
-  else clearUploadedPhoto();
+  clearUploadedPhoto();
   latestDesignId = design.id;
   $('#saveDesign').classList.add('saved');
   $('#saveDesign').innerHTML = '<span>♥</span> Saved';
   $('#studio').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  showToast('Opened your saved plan.');
+  showToast('Opened your saved plan. Any photo preview remains transient in this tab.');
 }
-function deleteSaved(id) {
+async function deleteSaved(id) {
+  if (!requireAccount()) return;
+  const memory = window.projectMemory;
+  const ownerUid = memory.user?.uid;
   const remaining = readSaved().filter(item => item.id !== id);
-  localStorage.setItem(STORAGE_KEYS.saved, JSON.stringify(remaining));
+  try { await memory.set('roomify-saved-designs', remaining); if (memory.user?.uid !== ownerUid || !memory.authenticated) throw new Error('Account changed during operation'); savedDesigns=remaining; }
+  catch { showToast('Could not remove this private design. Try again.'); return; }
   if (latestDesignId === id) {
     latestDesignId = null;
     $('#saveDesign').classList.remove('saved');
@@ -302,7 +368,7 @@ budgetSlider.addEventListener('input', () => {
   renderProducts();
 });
 $('#createPlan').addEventListener('click', createPlan);
-$('#saveDesign').addEventListener('click', saveDesign);
+$('#saveDesign').addEventListener('click', saveDesign); loadMemory(); window.projectMemory?.onAuth(loadMemory);
 roomFile.addEventListener('change', event => handleFiles(event.target.files?.[0]));
 window.addEventListener('resize', () => { if (currentUpload) beforeImage.style.width = `${$('#designImageWrap').clientWidth}px`; });
 clearUpload.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); clearUploadedPhoto(); });

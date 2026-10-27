@@ -60,7 +60,7 @@ const SECURITY_HEADERS = {
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'X-Frame-Options': 'DENY',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-  'Content-Security-Policy': "default-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'; base-uri 'self'; frame-ancestors 'none'"
+  'Content-Security-Policy': "default-src 'self'; img-src 'self' data:; script-src 'self' https://www.gstatic.com https://apis.google.com; style-src 'self'; connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com; frame-src https://diamond-roomify.firebaseapp.com; form-action 'self'; base-uri 'self'; frame-ancestors 'none'"
 };
 
 function sendJson(res, statusCode, payload, { head = false, headers = {} } = {}) {
@@ -92,7 +92,7 @@ function createServer() {
       }
       return sendJson(res, 405, {
         error: 'READ_ONLY_ENDPOINT',
-        message: 'The capabilities endpoint is read-only.',
+        message: 'Auth and private memory are configurable. Firebase is not live until the parent supplies public config; no account claims are made while config is null.',
         allowedMethods: ['GET', 'HEAD']
       }, { headers: { 'Allow': 'GET, HEAD' } });
     }
